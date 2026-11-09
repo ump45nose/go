@@ -68,6 +68,9 @@ func (decoder *sliceDecoder) doDecode(ptr unsafe.Pointer, iter *Iterator) {
 	sliceType := decoder.sliceType
 	if c == 'n' {
 		iter.skipThreeBytes('u', 'l', 'l')
+		if iter.Error != nil {
+			return
+		}
 		sliceType.UnsafeSetNil(ptr)
 		return
 	}

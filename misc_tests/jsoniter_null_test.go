@@ -79,3 +79,26 @@ func Test_decode_null_skip(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func Test_invalid_null_does_not_nil_preinitialized_map(t *testing.T) {
+	should := require.New(t)
+	for _, input := range []string{"none", "nan", "nil", "notjson", "n"} {
+		data := map[string]interface{}{}
+		err := jsoniter.Unmarshal([]byte(input), &data)
+		should.Error(err, input)
+		should.NotNil(data, input)
+		data["a"] = 1
+	}
+	data := map[string]interface{}{"keep": true}
+	should.Nil(jsoniter.Unmarshal([]byte("null"), &data))
+	should.Nil(data)
+}
+
+func Test_invalid_null_does_not_nil_preinitialized_slice(t *testing.T) {
+	should := require.New(t)
+	data := []interface{}{1}
+	err := jsoniter.Unmarshal([]byte("none"), &data)
+	should.Error(err)
+	should.NotNil(data)
+	should.Equal([]interface{}{1}, data)
+}
